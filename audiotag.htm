@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>player</title>
+</head>
+<body>
+<style>
+    audio {
+        width: 100%;
+    }
+
+</style>
+<audio id="player" src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-dubstep.mp3" controls autoplay preload=auto>
+</audio>
+
+<div>
+    <button onclick="document.getElementById('player').play()">Воспроизведение</button>
+    <button onclick="document.getElementById('player').pause()">Пауза</button>
+    <button onclick="document.getElementById('player').volume+=0.1">Громкость +</button>
+    <button onclick="document.getElementById('player').volume-=0.1">Громкость -</button>
+</div>
+
+</body>
+</html>
