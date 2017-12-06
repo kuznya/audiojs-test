@@ -41,27 +41,29 @@
 <script>
     $( function() {
         const audio = document.getElementById('player');
-//        const audio = $('#player');
-        $('ul li').click(function(e) {
-            console.log('click()');
-//            console.log(e);
-//            console.log(this);
-            e.preventDefault();
-            $(this).addClass('playing').siblings().removeClass('playing');
-            const url = $('a', this).attr('data-src');
-//            console.log(url);
+        function playTrack(track) {
+            track.addClass('playing').siblings().removeClass('playing');
+            const url = track.find('a').attr('data-src');
             audio.setAttribute('src', url);
             audio.play();
+        }
+        function stop() {
+            $('ul li').removeClass('playing');
+        }
+        audio.addEventListener('ended', function () {
+            console.log('ended()');
+            const next = $('ul li.playing').next();
+            if (next.length) {
+                playTrack(next);
+            } else {
+                stop();
+            }
+        });
+        $('ul li').click(function(e) {
+            e.preventDefault();
+            playTrack($(this));
         });
     })
 </script>
-
-<!--<div>-->
-    <!--<button onclick="document.getElementById('player').play()">play</button>-->
-    <!--<button onclick="document.getElementById('player').pause()">pause</button>-->
-    <!--<button onclick="document.getElementById('player').volume+=0.1">vol+</button>-->
-    <!--<button onclick="document.getElementById('player').volume-=0.1">vol-</button>-->
-<!--</div>-->
-
 </body>
 </html>
