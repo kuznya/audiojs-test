@@ -51,7 +51,7 @@
             audio.play();
         }
         audio.addEventListener('ended', function () {
-            console.log('ended()');
+            // console.log('ended()');
             const next = $('ul li.playing').next();
             if (next.length) {
                 playTrack(next);
