@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>audio.js</title>
+    <meta content="width=device-width, initial-scale=0.6" name="viewport">
+    <style>
+        body { color: #666; font-family: sans-serif; line-height: 1.4; }
+        h1 { color: #444; font-size: 1.2em; padding: 14px 2px 12px; margin: 0px; }
+        h1 em { font-style: normal; color: #999; }
+        a { color: #888; text-decoration: none; }
+        #wrapper { width: 400px; margin: 40px auto; }
+
+        ol { padding: 0px; margin: 0px; list-style: decimal-leading-zero inside; color: #ccc; width: 460px; border-top: 1px solid #ccc; font-size: 0.9em; }
+        ol li { position: relative; margin: 0px; padding: 9px 2px 10px; border-bottom: 1px solid #ccc; cursor: pointer; }
+        ol li a { display: block; text-indent: -3.3ex; padding: 0px 0px 0px 20px; }
+        li.playing { color: #aaa; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3); }
+        li.playing a { color: #000; }
+        li.playing:before { content: '♬'; width: 14px; height: 14px; padding: 3px; line-height: 14px; margin: 0px; position: absolute; left: -24px; top: 9px; color: #000; font-size: 13px; text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2); }
+
+        #shortcuts { position: fixed; bottom: 0px; width: 100%; color: #666; font-size: 0.9em; margin: 60px 0px 0px; padding: 20px 20px 15px; background: #f3f3f3; background: rgba(240, 240, 240, 0.7); }
+        #shortcuts div { width: 460px; margin: 0px auto; }
+        #shortcuts h1 { margin: 0px 0px 6px; }
+        #shortcuts p { margin: 0px 0px 18px; }
+        #shortcuts em { font-style: normal; background: #d3d3d3; padding: 3px 9px; position: relative; left: -3px;
+            -webkit-border-radius: 4px; -moz-border-radius: 4px; -o-border-radius: 4px; border-radius: 4px;
+            -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); -o-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); }
+
+        @media screen and (max-device-width: 480px) {
+            #wrapper { position: relative; left: -3%; }
+            #shortcuts { display: none; }
+        }
+
+        .credit {
+            text-align: center;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="audiojs/audio.js"></script>
+    <script>
+        $(function() {
+            // Setup the player to autoplay the next track
+            var a = audiojs.create(document.getElementsByTagName('audio'), {
+                trackEnded: function() {
+                    var next = $('ol li.playing').next();
+                    if (!next.length) next = $('ol li').first();
+                    next.addClass('playing').siblings().removeClass('playing');
+                    audio.load($('a', next).attr('data-src'));
+                    audio.play();
+                },
+                css: false,
+                createPlayer: {
+                    /*markup: false,*/
+                    playPauseClass: 'play-pauseZ',
+                    scrubberClass: 'scrubberZ',
+                    progressClass: 'progressZ',
+                    loaderClass: 'loadedZ',
+                    timeClass: 'timeZ',
+                    durationClass: 'durationZ',
+                    playedClass: 'playedZ',
+                    errorMessageClass: 'error-messageZ',
+                    playingClass: 'playingZ',
+                    loadingClass: 'loadingZ',
+                    errorClass: 'errorZ'
+                }
+            });
+
+            // Load in the first track
+            var audio = a[0];
+            first = $('ol a').attr('data-src');
+            $('ol li').first().addClass('playing');
+            audio.load(first);
+
+            // Load in a track on click
+            $('ol li').click(function(e) {
+                e.preventDefault();
+                $(this).addClass('playing').siblings().removeClass('playing');
+                audio.load($('a', this).attr('data-src'));
+                audio.play();
+            });
+            // Keyboard shortcuts
+            $(document).keydown(function(e) {
+                var unicode = e.charCode ? e.charCode : e.keyCode;
+                // right arrow
+                if (unicode == 39) {
+                    var next = $('li.playing').next();
+                    if (!next.length) next = $('ol li').first();
+                    next.click();
+                    // back arrow
+                } else if (unicode == 37) {
+                    var prev = $('li.playing').prev();
+                    if (!prev.length) prev = $('ol li').last();
+                    prev.click();
+                    // spacebar
+                } else if (unicode == 32) {
+                    audio.playPause();
+                }
+            })
+        });
+    </script>
+    <style>
+        .audiojsZ audio { position: absolute; left: -1px; }
+        .audiojsZ { width: 460px; height: 36px; background: #404040; overflow: hidden; font-family: monospace; font-size: 12px;
+            -webkit-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); -moz-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3);
+            -o-box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.3); }
+        .audiojsZ .play-pauseZ { width: 25px; height: 40px; padding: 4px 6px; margin: 0px; float: left; overflow: hidden; border-right: 1px solid #000; }
+        .audiojsZ p { display: none; width: 25px; height: 40px; margin: 0px; cursor: pointer; }
+        .audiojsZ .playZ { display: block; }
+        .audiojsZ .scrubberZ { width:280px;position: relative; float: left; background: #5a5a5a; height: 14px; margin: 10px; border-left: 0px; border-bottom: 0px; overflow: hidden; }
+        .audiojsZ .progressZ { position: absolute; top: 0px; left: 0px; height: 14px; width: 0px; background: #ccc; z-index: 1; }
+        .audiojsZ .loadedZ { position: absolute; top: 0px; left: 0px; height: 14px; width: 0px; background: #000; }
+        .audiojsZ .timeZ { float: left; height: 36px; line-height: 36px; margin: 0px 0px 0px 6px; padding: 0px 6px 0px 12px; border-left: 1px solid #000; color: #ddd; text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5); }
+        .audiojsZ .timeZ em { padding: 0px 2px 0px 0px; color: #f7f7f7; font-style: normal; }
+        .audiojsZ .timeZ strong { padding: 0px 0px 0px 2px; font-weight: normal; }
+        .audiojsZ .error-messageZ { float: left; display: none; margin: 0px 10px; height: 36px; width: 400px; overflow: hidden; line-height: 36px; white-space: nowrap; color: #fff;
+            text-overflow: ellipsis; -o-text-overflow: ellipsis; -icab-text-overflow: ellipsis; -khtml-text-overflow: ellipsis; -moz-text-overflow: ellipsis; -webkit-text-overflow: ellipsis; }
+        .audiojsZ .error-messageZ a { color: #eee; text-decoration: none; padding-bottom: 1px; border-bottom: 1px solid #999; white-space: wrap; }
+
+        .audiojsZ .playZ { background: url('audiojs/player-graphics.gif') -2px -1px no-repeat; }
+        .audiojsZ .loadingZ { background: url('audiojs/player-graphics.gif') -2px -31px no-repeat; }
+        .audiojsZ .errorZ { background: url('audiojs/player-graphics.gif') -2px -61px no-repeat; }
+        .audiojsZ .pauseZ { background: url('audiojs/player-graphics.gif') -2px -91px no-repeat; }
+
+        .playingZ .playZ, .playingZ .loadingZ, .playingZ .errorZ { display: none; }
+        .playingZ .pauseZ { display: block; }
+
+        .loadingZ .playZ, .loadingZ .pauseZ, .loadingZ .errorZ { display: none; }
+        .loadingZ .loadingZ { display: block; }
+
+        .errorZ .timeZ, .errorZ .playZ, .errorZ .pauseZ, .errorZ .scrubberZ, .errorZ .loadingZ { display: none; }
+        .errorZ .errorZ { display: block; }
+        .errorZ .play-pauseZ p { cursor: auto; }
+        .errorZ .error-messageZ { display: block; }
+
+        .audiojsZ { width: 660px;}
+        .audiojsZ .scrubberZ { width: 480px; }
+    </style>
+</head>
+<body>
+<div id="wrapper">
+    <h1>Bensound Royalty Free Tracks</h1>
+    <div class="audiojsZ">
+        <audio src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-dubstep.mp3" preload></audio>
+        <div class="play-pauseZ">
+            <p class="playZ"></p>
+            <p class="pauseZ"></p>
+            <p class="loadingZ"></p>
+            <p class="errorZ"></p>
+        </div>
+        <div class="scrubberZ">
+            <div class="progressZ"></div>
+            <div class="loadedZ"></div>
+        </div>
+        <div class="timeZ">
+            <em class="playedZ">00:00</em>/<strong class="durationZ">00:00</strong>
+        </div>
+        <div class="error-messageZ"></div>
+    </div>
+    <ol>
+        <li><a href="#" data-src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-dubstep.mp3">Dubstep</a></li>
+        <li><a href="#" data-src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-cute.mp3">Cute</a></li>
+        <li><a href="#" data-src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-buddy.mp3">Buddy</a></li>
+        <li><a href="#" data-src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-acousticbreeze.mp3">Acoustic Breeze</a></li>
+        <li><a href="#" data-src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-epic.mp3">Epic</a></li>
+        <li><a href="#" data-src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-funnysong.mp3">Funny Song</a></li>
+        <li><a href="#" data-src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-littleidea.mp3">Little Idea</a></li>
+        <li><a href="#" data-src="https://raw.githubusercontent.com/kolber/audiojs/master/mp3/bensound-betterdays.mp3">Better Days</a></li>
+    </ol>
+</div>
+<div id="shortcuts">
+    <div>
+        <h1>Keyboard shortcuts:</h1>
+        <p><em>&rarr;</em> Next track</p>
+        <p><em>&larr;</em> Previous track</p>
+        <p><em>Space</em> Play/pause</p>
+    </div>
+</div>
+
+<p class="credit"><a href="http://www.bensound.com/royalty-free-music/">Royalty Free Music from Bensound</a></p>
+</body>
+</html>
